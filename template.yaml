@@ -1,0 +1,102 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: aks-deploy-template
+  title: Deploy AKS
+  description: Deploy AKS cluster, resource group, and PostgreSQL database
+  tags:
+    - resources
+    - aks
+spec:
+  owner: jamesm553@gmail.com
+  type: resource
+  parameters:
+    - title: Cluster Details
+      required:
+        - clusterName
+        - region
+        - nodeSize
+      properties:
+        clusterName:
+          type: string
+          title: Cluster Name
+          description: "Unique name for the AKS cluster"
+        region:
+          type: string
+          title: Azure Region
+          description: "Azure region where the cluster will be deployed"
+        nodeSize:
+          type: string
+          title: Node Size
+          description: "Size of the VMs for the cluster nodes"
+    
+    - title: Resource Group Details
+      required:
+        - rgName
+        - rgRegion
+      properties:
+        rgName:
+          type: string
+          title: Resource Group Name
+          description: "Name for the Azure resource group"
+        rgRegion:
+          type: string
+          title: Resource Group Region
+          description: "Azure region where the resource group will be deployed"
+
+    - title: PostgreSQL Database Details
+      required:
+        - pgServerName
+        - pgSku
+        - pgVersion
+        - pgAdminUsername
+        - pgAdminPassword
+      properties:
+        pgServerName:
+          type: string
+          title: PostgreSQL Server Name
+          description: "Name for the PostgreSQL server"
+        pgSku:
+          type: string
+          title: PostgreSQL SKU
+          description: "SKU for the PostgreSQL server"
+        pgVersion:
+          type: string
+          title: PostgreSQL Version
+          description: "Version of PostgreSQL"
+        pgAdminUsername:
+          type: string
+          title: PostgreSQL Admin Username
+          description: "Admin username for the PostgreSQL server"
+        pgAdminPassword:
+          type: string
+          title: PostgreSQL Admin Password
+          description: "Admin password for the PostgreSQL server"
+
+  steps:
+    - id: createResourceGroup
+      name: Create Resource Group
+      action: azure:resourceManager.createOrUpdateResourceGroup
+      input:
+        resourceGroupName: ${{ parameters.rgName }}
+        region: ${{ parameters.rgRegion }}
+
+    - id: deployAKSCluster
+      name: Deploy AKS Cluster
+      action: aks:deploy
+      input:
+        clusterName: ${{ parameters.clusterName }}
+        region: ${{ parameters.region }}
+        nodeSize: ${{ parameters.nodeSize }}
+
+    - id: deployPostgreSQL
+      name: Deploy PostgreSQL Database
+      action: azure:postgres.deploy
+      input:
+        resourceGroupName: ${{ parameters.rgName }}
+        location: ${{ parameters.rgRegion }}
+        postgresServerName: ${{ parameters.pgServerName }}
+        sku: ${{ parameters.pgSku }}
+        version: ${{ parameters.pgVersion }}
+        adminUsername: ${{ parameters.pgAdminUsername }}
+        adminPassword: ${{ parameters.pgAdminPassword }}
