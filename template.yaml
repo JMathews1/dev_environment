@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: aks-deploy-template
-  title: Deploy AKS
-  description: Deploy AKS cluster, resource group, and PostgreSQL database
+  name: dev-env-deploy-template
+  title: Deploy dev env
+  description: Deploy dev env with AKS cluster, resource group, and PostgreSQL database
   tags:
     - resources
     - aks
