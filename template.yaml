@@ -29,7 +29,7 @@ spec:
           type: string
           title: Node Size
           description: "Size of the VMs for the cluster nodes"
-    
+
     - title: Resource Group Details
       required:
         - rgName
@@ -74,29 +74,17 @@ spec:
           description: "Admin password for the PostgreSQL server"
 
   steps:
-    - id: createResourceGroup
-      name: Create Resource Group
-      action: azure:resourceManager.createOrUpdateResourceGroup
-      input:
-        resourceGroupName: ${{ parameters.rgName }}
-        region: ${{ parameters.rgRegion }}
-
-    - id: deployAKSCluster
-      name: Deploy AKS Cluster
-      action: aks:deploy
+    - id: deployDevEnv
+      name: Deploy Dev Environment
+      action: dev-env:deploy
       input:
         clusterName: ${{ parameters.clusterName }}
         region: ${{ parameters.region }}
         nodeSize: ${{ parameters.nodeSize }}
-
-    - id: deployPostgreSQL
-      name: Deploy PostgreSQL Database
-      action: azure:postgres.deploy
-      input:
-        resourceGroupName: ${{ parameters.rgName }}
-        location: ${{ parameters.rgRegion }}
-        postgresServerName: ${{ parameters.pgServerName }}
-        sku: ${{ parameters.pgSku }}
-        version: ${{ parameters.pgVersion }}
-        adminUsername: ${{ parameters.pgAdminUsername }}
-        adminPassword: ${{ parameters.pgAdminPassword }}
+        rgName: ${{ parameters.rgName }}
+        rgRegion: ${{ parameters.rgRegion }}
+        pgServerName: ${{ parameters.pgServerName }}
+        pgSku: ${{ parameters.pgSku }}
+        pgVersion: ${{ parameters.pgVersion }}
+        pgAdminUsername: ${{ parameters.pgAdminUsername }}
+        pgAdminPassword: ${{ parameters.pgAdminPassword }}
